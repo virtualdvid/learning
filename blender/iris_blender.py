@@ -10,7 +10,7 @@ for i in range(len(df)):
     v = df.iloc[i]
      
     if v[4] == 'setosa':
-	bpy.ops.mesh.primitive_cone_add(location=(0,0,0))
+        bpy.ops.mesh.primitive_cone_add(location=(0,0,0))
     if v[4] == 'versicolor':
         bpy.ops.mesh.primitive_cube_add(location=(0,0,0))
     if v[4] == 'virginica':
