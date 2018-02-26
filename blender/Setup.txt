@@ -4,4 +4,4 @@ cd pandas
 
 python setup.py build_ext --inplace --force
 
-sudo pip install .  # don't forget the dot 
+pip install .  # don't forget the dot 
