@@ -1,6 +1,9 @@
 #Use jupyter terminal
+
 conda create -n python3x -c intel python=3
 source activate python3x
+pip install --upgrade pip
+pip install keras
 conda install -c conda-forge bazel
 conda install patch
 pip install --upgrade setuptools
@@ -12,10 +15,16 @@ cd tensorflow
 git checkout r1.7
 bazel clean
 bazel shutdown
-./configure #all options with 'n' kafka 'y'
-which gcc #PATH = output
+
+#all options with 'n' except kafka 'y'
+./configure
+
+#PATH = output
+which gcc
 export PATH=/bin/gcc:$PATH
 export LD_LIBRARY_PATH=/PATH//lib64:$LD_LIBRARY_PATH
 bazel build --config=mkl -c opt --copt=-mavx --copt=-mavx2 --copt=-mfma --copt=-mavx512f --copt=-mavx512pf --copt=-mavx512cd --copt=-mavx512er --copt="-DEIGEN_USE_VML" //tensorflow/tools/pip_package:build_pip_package
 bazel-bin/tensorflow/tools/pip_package/build_pip_package ~/home/uxxxxx/tensorflow_pkg
-pip install --ignore-installed /home/uxxxxx/tensorflow_pkg/tensorflow-1.7.1-cp36-cp36m-linux_x86_64.whl ##--upgrade --user if don't use conda
+
+#--upgrade --user if you aren't using a conda env
+pip install --ignore-installed /home/uxxxxx/tensorflow_pkg/tensorflow-1.7.1-cp36-cp36m-linux_x86_64.whl
