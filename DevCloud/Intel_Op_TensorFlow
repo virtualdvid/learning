@@ -1,0 +1,22 @@
+#Use jupyter terminal
+conda create -n iMaterialist intelpython3_full python=3
+source activate iMaterialist
+conda install -c conda-forge bazel
+conda install patch
+pip install --upgrade setuptools
+cd .conda/envs/python3x/lib/python3.6/site-packages
+pip uninstall tensorflow
+rm -rf tensorflow 
+git clone https://github.com/tensorflow/tensorflow.git
+cd tensorflow
+git checkout r1.7
+bazel clean
+bazel shutdown
+./configure #all options with 'n' kafka 'y'
+which gcc #PATH = output
+export PATH=/bin/gcc:$PATH
+export LD_LIBRARY_PATH=/PATH//lib64:$LD_LIBRARY_PATH
+bazel build --config=mkl -c opt --copt=-mavx --copt=-mavx2 --copt=-mfma --copt=-mavx512f --copt=-mavx512pf --copt=-mavx512cd --copt=-mavx512er --copt="-DEIGEN_USE_VML" //tensorflow/tools/pip_package:build_pip_package
+#bazel build --config=mkl -c opt //tensorflow/tools/pip_package:build_pip_package
+bazel-bin/tensorflow/tools/pip_package/build_pip_package ~/home/u14145/tensorflow_pkg
+pip install --ignore-installed /home/u14145/tensorflow_pkg/tensorflow-1.7.1-cp36-cp36m-linux_x86_64.whl ##--upgrade --user no conda
