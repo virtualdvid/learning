@@ -12,7 +12,7 @@ pip uninstall tensorflow
 rm -rf tensorflow 
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow
-git checkout r1.7
+git checkout r1.8
 bazel clean
 bazel shutdown
 
@@ -24,7 +24,9 @@ which gcc
 export PATH=/bin/gcc:$PATH
 export LD_LIBRARY_PATH=/PATH//lib64:$LD_LIBRARY_PATH
 bazel build --config=mkl -c opt --copt=-mavx --copt=-mavx2 --copt=-mfma --copt=-mavx512f --copt=-mavx512pf --copt=-mavx512cd --copt=-mavx512er --copt="-DEIGEN_USE_VML" //tensorflow/tools/pip_package:build_pip_package
-bazel-bin/tensorflow/tools/pip_package/build_pip_package ~/home/uxxxxx/tensorflow_pkg
+#Use if command above fails
+bazel build --config=mkl -c opt //tensorflow/tools/pip_package:build_pip_package
+bazel-bin/tensorflow/tools/pip_package/build_pip_package /home/uxxxxx/tensorflow_pkg
 
-#--upgrade --user if you aren't using a conda env
+#--user if you aren't using a conda env
 pip install --ignore-installed /home/uxxxxx/tensorflow_pkg/tensorflow-1.7.1-cp36-cp36m-linux_x86_64.whl
