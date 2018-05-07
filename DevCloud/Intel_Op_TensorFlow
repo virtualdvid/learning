@@ -21,11 +21,12 @@ bazel shutdown
 
 #PATH = output
 which gcc
-export PATH=/bin/gcc:$PATH
-export LD_LIBRARY_PATH=/PATH//lib64:$LD_LIBRARY_PATH
+export PATH=/glob/development-tools/gcc/bin:$PATH
+export LD_LIBRARY_PATH=/glob/development-tools/gcc/lib64:$LD_LIBRARY_PATH
 bazel build --config=mkl -c opt --copt=-mavx --copt=-mavx2 --copt=-mfma --copt=-mavx512f --copt=-mavx512pf --copt=-mavx512cd --copt=-mavx512er --copt="-DEIGEN_USE_VML" //tensorflow/tools/pip_package:build_pip_package
+#bazel build --config=mkl --copt=”-DEIGEN_USE_VML” -c opt //tensorflow/tools/pip_package:build_pip_package
 #Use if command above fails
-bazel build --config=mkl -c opt //tensorflow/tools/pip_package:build_pip_package
+#bazel build --config=mkl -c opt //tensorflow/tools/pip_package:build_pip_package
 bazel-bin/tensorflow/tools/pip_package/build_pip_package /home/uxxxxx/tensorflow_pkg
 
 #--user if you aren't using a conda env
