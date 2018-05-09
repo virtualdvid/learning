@@ -18,7 +18,7 @@ import warnings
 import multiprocessing.pool
 from functools import partial
 
-from .. import backend as K
+#from .. import backend as K
 from ..utils.data_utils import Sequence
 
 from skimage import data, img_as_float #####
