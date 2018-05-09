@@ -638,28 +638,28 @@ class ImageDataGenerator(object):
                  validation_split=0.0):
         if data_format is None:
             data_format = K.image_data_format()
-		self.contrast_stretching = contrast_stretching #####
-		self.adaptive_equalization = adaptive_equalization #####
-		self.histogram_equalization = histogram_equalization #####
-		self.featurewise_center = featurewise_center
-		self.samplewise_center = samplewise_center
-		self.featurewise_std_normalization = featurewise_std_normalization
-		self.samplewise_std_normalization = samplewise_std_normalization
-		self.zca_whitening = zca_whitening
-		self.zca_epsilon = zca_epsilon
-		self.rotation_range = rotation_range
-		self.width_shift_range = width_shift_range
-		self.height_shift_range = height_shift_range
-		self.brightness_range = brightness_range
-		self.shear_range = shear_range
-		self.zoom_range = zoom_range
-		self.channel_shift_range = channel_shift_range
-		self.fill_mode = fill_mode
-		self.cval = cval
-		self.horizontal_flip = horizontal_flip
-		self.vertical_flip = vertical_flip
-		self.rescale = rescale
-		self.preprocessing_function = preprocessing_function
+        self.contrast_stretching = contrast_stretching #####
+        self.adaptive_equalization = adaptive_equalization #####
+        self.histogram_equalization = histogram_equalization #####
+        self.featurewise_center = featurewise_center
+        self.samplewise_center = samplewise_center
+        self.featurewise_std_normalization = featurewise_std_normalization
+        self.samplewise_std_normalization = samplewise_std_normalization
+        self.zca_whitening = zca_whitening
+        self.zca_epsilon = zca_epsilon
+        self.rotation_range = rotation_range
+        self.width_shift_range = width_shift_range
+        self.height_shift_range = height_shift_range
+        self.brightness_range = brightness_range
+        self.shear_range = shear_range
+        self.zoom_range = zoom_range
+        self.channel_shift_range = channel_shift_range
+        self.fill_mode = fill_mode
+        self.cval = cval
+        self.horizontal_flip = horizontal_flip
+        self.vertical_flip = vertical_flip
+        self.rescale = rescale
+        self.preprocessing_function = preprocessing_function
 
         if data_format not in {'channels_last', 'channels_first'}:
             raise ValueError(
@@ -1032,18 +1032,18 @@ class ImageDataGenerator(object):
         if self.brightness_range is not None:
             x = random_brightness(x, self.brightness_range)
 
-		if self.contrast_stretching: #####
-			if np.random.random() < 0.5: #####
-				p2, p98 = np.percentile(x, (2, 98)) #####
-				x = exposure.rescale_intensity(x, in_range=(p2, p98)) #####
+        if self.contrast_stretching: #####
+            if np.random.random() < 0.5: #####
+                p2, p98 = np.percentile(x, (2, 98)) #####
+                x = exposure.rescale_intensity(x, in_range=(p2, p98)) #####
 
-		if self.adaptive_equalization: #####
-			if np.random.random() < 0.5: #####
-				x = exposure.equalize_adapthist(x, clip_limit=0.03) #####
-			
-		if self.histogram_equalization: #####
-			if np.random.random() < 0.5: #####
-				x = exposure.equalize_hist(x) #####
+        if self.adaptive_equalization: #####
+            if np.random.random() < 0.5: #####
+                x = exposure.equalize_adapthist(x, clip_limit=0.03) #####
+
+        if self.histogram_equalization: #####
+            if np.random.random() < 0.5: #####
+                x = exposure.equalize_hist(x) #####
 				
         return x
 
