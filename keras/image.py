@@ -3,6 +3,9 @@
 Can easily be extended to include new transformations,
 new preprocessing methods, etc...
 """
+
+##### https://towardsdatascience.com/image-augmentation-for-deep-learning-using-keras-and-histogram-equalization-9329f6ae5085
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
