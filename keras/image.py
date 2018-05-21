@@ -1662,7 +1662,7 @@ class DirectoryIterator(Iterator):
                 batch_y[i, label] = 1.
         else:
             return batch_x
-        return batch_x, batch_y
+        return batch_x, [batch_y, batch_y]
 
     def next(self):
         """For python 2.x.
