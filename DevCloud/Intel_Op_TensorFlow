@@ -1,34 +1,38 @@
-#Use jupyter terminal
+qsub -I
+export JAVA_HOME=/usr
 
-conda create -n python3x -c intel python=3
-source activate python3x
+conda config --add channels intel
+conda create -n tf_op -c intel python=3
+#conda create -n tf_op intelpython3_full python=3
+source activate tf_op
 pip install --upgrade pip
-pip install keras
 conda install -c conda-forge bazel
+pip install keras
 conda install patch
-pip install --upgrade setuptools
-cd .conda/envs/python3x/lib/python3.6/site-packages
+conda install -c anaconda libgcc
+conda install -c anaconda mkl
+#pip install --upgrade setuptools
+cd .conda/envs/tf_op/lib/python3.6/site-packages
 pip uninstall tensorflow
-rm -rf tensorflow 
+rm -rf tensorflow
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow
-git checkout r1.8
-bazel clean
-bazel shutdown
+#git checkout r1.8
+git checkout 2c5e94c075454bf23bfa5a8a83e2d05011f4758e
 
-#all options with 'n' except kafka 'y'
+#all options with 'n'
 ./configure
 
-#PATH = output
-which gcc
 export PATH=/glob/development-tools/gcc/bin:$PATH
 export LD_LIBRARY_PATH=/glob/development-tools/gcc/lib64:$LD_LIBRARY_PATH
-bazel build --config=mkl -c opt --copt=-mavx --copt=-mavx2 --copt=-mfma --copt=-mavx512f --copt=-mavx512pf --copt=-mavx512cd --copt=-mavx512er --copt="-DEIGEN_USE_VML" //tensorflow/tools/pip_package:build_pip_package
-#bazel build --config=mkl --copt=”-DEIGEN_USE_VML” -c opt //tensorflow/tools/pip_package:build_pip_package
-#Use if command above fails
-#bazel build --config=mkl -c opt //tensorflow/tools/pip_package:build_pip_package
-bazel-bin/tensorflow/tools/pip_package/build_pip_package /home/uxxxxx/tensorflow_pkg
+#export LD_LIBRARY_PATH=/home/uxxxx/.conda/envs/python3x/lib:$LD_LIBRARY_PATH #into file script
+bazel build --config=mkl -c opt --copt=-mavx --copt=-mavx2 --copt=-mfma --copt=-mavx512f --copt=-mavx512pf --copt=-mavx512cd --copt=-mavx512er --copt="-DEIGEN_USE_VML" --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" //tensorflow/tools/pip_package:build_pip_package
+
+bazel clean #use in case of an error
+bazel shutdown #use in case of an error
+
+## Create the whl file
+bazel-bin/tensorflow/tools/pip_package/build_pip_package ~/tensorflow_pkg
 
 #--user if you aren't using a conda env
-pip install --ignore-installed /home/uxxxxx/tensorflow_pkg/tensorflow-1.7.1-cp36-cp36m-linux_x86_64.whl
-pip install --ignore-installed /home/uxxxxx/tensorflow_pkg/tensorflow-1.8.0-cp36-cp36m-linux_x86_64.whl
+pip install --ignore-installed ~/tensorflow_pkg/tensorflow-1.8.0-cp36-cp36m-linux_x86_64.whl
