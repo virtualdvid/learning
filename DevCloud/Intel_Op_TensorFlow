@@ -8,24 +8,23 @@ source activate tf_op
 pip install --upgrade pip
 conda install -c conda-forge bazel
 pip install keras
-conda install patch
-conda install -c anaconda libgcc
-conda install -c anaconda mkl
+#conda install patch
+#conda install -c anaconda libgcc
+#conda install -c anaconda mkl
 #pip install --upgrade setuptools
 cd .conda/envs/tf_op/lib/python3.6/site-packages
 pip uninstall tensorflow
 rm -rf tensorflow
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow
-#git checkout r1.8
-git checkout 2c5e94c075454bf23bfa5a8a83e2d05011f4758e
+git checkout r1.8
+#git checkout 2c5e94c075454bf23bfa5a8a83e2d05011f4758e #Use in case: OP_REQUIRES failed at mkl_concat_op.cc:784 : Aborted: Operation received an exception:Status: 3, message: could not create a concat primitive descriptor, in file tensorflow/core/kernels/mkl_concat_op.cc:781
 
 #all options with 'n'
 ./configure
 
 export PATH=/glob/development-tools/gcc/bin:$PATH
 export LD_LIBRARY_PATH=/glob/development-tools/gcc/lib64:$LD_LIBRARY_PATH
-#export LD_LIBRARY_PATH=/home/uxxxx/.conda/envs/python3x/lib:$LD_LIBRARY_PATH #into file script
 bazel build --config=mkl -c opt --copt=-mavx --copt=-mavx2 --copt=-mfma --copt=-mavx512f --copt=-mavx512pf --copt=-mavx512cd --copt=-mavx512er --copt="-DEIGEN_USE_VML" --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" //tensorflow/tools/pip_package:build_pip_package
 
 bazel clean #use in case of an error
