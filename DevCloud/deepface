@@ -1,6 +1,10 @@
-pip install docker
-pip install websocket-client
+#pip install docker
+#pip install websocket-client
 pip install tqdm
+pip install cmake
 pip install dlib
+#conda install dlib
 pip install face_recognition
-conda install -c conda-forge ffmpeg
+#conda install -c conda-forge ffmpeg
+pip install moviepy
+pip install cython
