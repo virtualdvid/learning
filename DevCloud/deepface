@@ -3,3 +3,4 @@ pip install websocket-client
 pip install tqdm
 pip install dlib
 pip install face_recognition
+conda install -c conda-forge ffmpeg
