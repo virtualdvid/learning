@@ -1,0 +1,5 @@
+pip install docker
+pip install websocket-client
+pip install tqdm
+pip install dlib
+pip install face_recognition
