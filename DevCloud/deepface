@@ -2,9 +2,10 @@
 #pip install websocket-client
 pip install tqdm
 pip install cmake
-pip install dlib
-#conda install dlib
+conda install -c conda-forge dlib
 pip install face_recognition
 #conda install -c conda-forge ffmpeg
+#conda install -c conda-forge opencv ffmpeg
+#conda install -c menpo opencv3 ffmpeg
 pip install moviepy
 pip install cython
