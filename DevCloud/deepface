@@ -4,8 +4,8 @@ pip install tqdm
 pip install cmake
 conda install -c conda-forge dlib
 pip install face_recognition
-#conda install -c conda-forge ffmpeg
-#conda install -c conda-forge opencv ffmpeg
-#conda install -c menpo opencv3 ffmpeg
 pip install moviepy
 pip install cython
+pip uninstall opencv-python
+pip install --ignore-installed opencv-python
+python -c "import cv2; print(cv2.getBuildInformation())" | grep -i ffmpeg
