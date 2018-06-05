@@ -3,6 +3,7 @@
 pip install tqdm
 pip install cmake
 conda install -c conda-forge dlib
+conda update dlib
 pip install face_recognition
 pip install moviepy
 pip install cython
