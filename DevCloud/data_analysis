@@ -1,0 +1,3 @@
+###Home Credit - Kaggle###
+#conda install -c conda-forge lightgbm
+pip install lightgbm
