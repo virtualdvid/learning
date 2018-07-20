@@ -14,6 +14,7 @@ from lxml.html import fromstring
 import os
 import sys
 from fake_useragent import UserAgent
+from webdriver_manager.chrome import ChromeDriverManager #https://github.com/SergeyPirogov/webdriver_manager
 
 def search(keyword):
     base_url = "https://www.google.com/search?q={}&source=lnms&tbm=isch&sa=X&ved=0ahUKEwiwoLXK1qLVAhWqwFQKHYMwBs8Q_AUICigB"
@@ -21,7 +22,7 @@ def search(keyword):
     url = base_url.format(keyword.lower().replace(" ", "+"))
 
     # Create a browser and resize for exact pinpoints
-    browser = webdriver.Chrome()
+    browser = webdriver.Chrome(ChromeDriverManager().install())
     browser.set_window_size(1024, 768)
     print("\n===============================================\n")
     print("[%] Successfully launched Chrome Browser")
