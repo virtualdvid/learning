@@ -1,5 +1,5 @@
 # based on the code from Rushil Srivastava
-# https://github.com/rushilsrivastava/image-scrapers/blob/master/google-scrapper.py
+# https://github.com/rushilsrivastava/image_search/
 
 import requests
 import time
