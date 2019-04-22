@@ -43,6 +43,18 @@ def arg_parameters():
     args = parser.parse_args()
     return args
 
+def space_dict():
+    return {
+        'filter': int(np.random.choice([32, 64, 128, 256, 512])),
+        'kernel': int(np.random.choice([3, 4])),
+        'activation_0': np.random.choice(['relu', 'tanh']),
+        'activation_1': np.random.choice(['softmax','sigmoid']),
+        'range': int(np.random.choice([2, 3])),
+        'optimizer': np.random.choice(['adam', 'sgd']),
+        'dropout': np.random.uniform(0, 0.5),
+        'minibatch': int(np.random.choice([16, 32, 64, 128])),
+        'conditional': np.random.choice([True, False])
+    }
 
 def elapsed(start):
     """
@@ -89,30 +101,17 @@ def data():
 
     return generator, X_test, Y_test, class_weights, images
 
-def space():
-    return {
-        'filter': np.random.choice([32, 64, 128, 256, 512]),
-        'kernel': np.random.choice([3, 4]),
-        'activation_0': np.random.choice(['relu', 'tanh']),
-        'activation_1': np.random.choice(['softmax','sigmoid']),
-        'range': np.random.choice([2, 3]),
-        'optimizer': np.random.choice(['adam', 'sgd']),
-        'dropout': np.random.uniform(0, 0.5),
-        'minibatch': np.random.choice([16, 32, 64, 128]),
-        'conditional': np.random.choice([True, False])
-    }
-
 class StopTraining(callbacks.Callback):
-def __init__(self, monitor='val_loss', patience=10, goal=0.5):
-    self.monitor = monitor
-    self.patience = patience
-    self.goal = goal
+    def __init__(self, monitor='val_loss', patience=10, goal=0.5):
+        self.monitor = monitor
+        self.patience = patience
+        self.goal = goal
 
-def on_epoch_end(self, epoch, logs={}):
-    current_val_acc = logs.get(self.monitor)
+    def on_epoch_end(self, epoch, logs={}):
+        current_val_acc = logs.get(self.monitor)
 
-    if current_val_acc < self.goal and epoch == self.patience:
-        self.model.stop_training = True
+        if current_val_acc < self.goal and epoch == self.patience:
+            self.model.stop_training = True
 
 ## Hyperas ##
 
@@ -124,7 +123,7 @@ def model_op(generator, X_test, Y_test, class_weights, images):
     total_train_images = images.count - len(X_test)
     n_classes = len(images.classes)
     log = {'model_name': model_name}
-    space = space()
+    space = space_dict()
 
     try:
         model = Sequential()
@@ -133,7 +132,7 @@ def model_op(generator, X_test, Y_test, class_weights, images):
         log['filter_0'] = filter_0
         kernel_0 = space['kernel']
         log['kernel_0'] = kernel_0
-        activation_0 = space['activation']
+        activation_0 = space['activation_0']
         log['activation_0'] = activation_0
         model.add(layers.Conv2D(
             filters=filter_0,
@@ -197,17 +196,17 @@ def model_op(generator, X_test, Y_test, class_weights, images):
         if conditional_2:
             filter_1 = space['filter']
             log['filter_1'] = filter_1
-            activation_1 = space['activation_0']
-            log['activation_1'] = activation_1
-            model.add(layers.Dense(filter_1, activation=activation_1))
+            activation_0 = space['activation_0']
+            log['activation_1'] = activation_0
+            model.add(layers.Dense(filter_1, activation=activation_0))
 
         dropout_1 = space['dropout']
         log['dropout_1'] = dropout_1
         model.add(layers.Dropout(dropout_1))
 
-        activation_2 = space['activation_2']
-        log['activation_2'] = activation_2
-        model.add(layers.Dense(n_classes, activation=activation_2))
+        activation_1 = space['activation_1']
+        log['activation_2'] = activation_1
+        model.add(layers.Dense(n_classes, activation=activation_1))
 
         optimizer = space['optimizer']
         log['optimizer'] = optimizer
@@ -279,7 +278,7 @@ def model_op(generator, X_test, Y_test, class_weights, images):
 			
     except Exception as e:
         acc = 0.0
-        model = Sequential()
+        STATUS_OK = False
         print('failed', e)
 		
     K.clear_session()
@@ -315,7 +314,8 @@ if __name__ == "__main__":
     generator, X_test, Y_test, class_weights, images = data()
     
     best_results = []
-    for _ in range(max_evals):
+    for i, _ in enumerate(range(max_evals)):
+        print('{} of {}'.format(i, max_evals))
         results = model_op(generator, X_test, Y_test, class_weights, images)
         if results['status'] == True:
             best_results.append(results)
