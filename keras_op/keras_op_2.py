@@ -116,7 +116,7 @@ def on_epoch_end(self, epoch, logs={}):
 
 ## Hyperas ##
 
-def model_op(gap_generator, X_test, Y_test, class_weights, images):
+def model_op(generator, X_test, Y_test, class_weights, images):
 
     args = arg_parameters()
     data_set = args.data
@@ -242,11 +242,11 @@ def model_op(gap_generator, X_test, Y_test, class_weights, images):
             min_lr=5e-7
         )
 
-        minibatch_size = {{choice([16, 32, 64, 128])}}
+        minibatch_size = space['minibatch']
         log['minibatch_size'] = minibatch_size
 
         history = model.fit_generator(
-            generator=gap_generator(minibatch_size, images),
+            generator=generator(minibatch_size, images),
             validation_data=(X_test, Y_test),
             epochs=100,
             steps_per_epoch=int(total_train_images / minibatch_size),
@@ -289,7 +289,7 @@ def model_op(gap_generator, X_test, Y_test, class_weights, images):
         'loss': -acc,
         'status': STATUS_OK,
         'model': model_name
-    } 
+    }
 
 
 if __name__ == "__main__":
