@@ -9,6 +9,7 @@ import secrets
 import shutil
 import argparse
 import gc
+from tqdm import tqdm, trange
 from random import randint
 import numpy as np
 
@@ -53,7 +54,8 @@ def space_dict():
         'optimizer': np.random.choice(['adam', 'sgd']),
         'dropout': np.random.uniform(0, 0.5),
         'minibatch': int(np.random.choice([16, 32, 64, 128])),
-        'conditional': np.random.choice([True, False])
+        'conditional': np.random.choice([True, False]),
+        'lr_reducer_factor': np.random.uniform(0, 1),
     }
 
 def elapsed(start):
@@ -128,92 +130,66 @@ def model_op(generator, X_test, Y_test, class_weights, images):
     try:
         model = Sequential()
 
-        filter_0 = space['filter']
-        log['filter_0'] = filter_0
-        kernel_0 = space['kernel']
-        log['kernel_0'] = kernel_0
-        activation_0 = space['activation_0']
-        log['activation_0'] = activation_0
+        log['filter_0'] = space['filter']
+        log['kernel_0'] = space['kernel']
+        log['activation_0'] = space['activation_0']
         model.add(layers.Conv2D(
-            filters=filter_0,
-            kernel_size=kernel_0,
-            activation=activation_0,
+            filters=log['filter_0'],
+            kernel_size=log['kernel_0'],
+            activation=log['activation_0'],
             input_shape=(128,128,3)
             )
         )
 
-        # conditional_0 = space['conditional']
-        # log['conditional_0'] = conditional_0
-        # if conditional_0:
-        #     layers.BatchNormalization()
-        # activity_regularizer=regularizers.l1(0.001)
-        # kernel_regularizer=regularizers.l2(0.001)
-
-        conditional_0 = space['conditional']
-        log['conditional_0'] = conditional_0
-        if conditional_0:
+        log['conditional_0'] = space['conditional']
+        if log['conditional_0']:
             model.add(layers.MaxPooling2D(pool_size=(2, 2)))
 
-        conditional_1 = space['conditional']
-        log['conditional_1'] = conditional_1
-        if conditional_1:
-            dropout_0 = space['dropout']
-            log['dropout_0'] = dropout_0
-            model.add(layers.Dropout(dropout_0))
+        log['conditional_1'] = space['conditional']
+        if log['conditional_1']:
+            log['dropout_0'] = space['dropout']
+            model.add(layers.Dropout(log['dropout_0']))
 
-        range_0 = space['range']
-        log['range_0'] = range_0
-        for i, _ in enumerate(range(range_0), 1):
-            filters = space['filter']
-            log["filters_{}".format(i)] = filters
-            kernel_sizes = space['kernel']
-            log["kernel_sizes_{}".format(i)] = kernel_sizes
-            activations = space['activation_0']
-            log["activations_{}".format(i)] = activations
+        log['range_0'] = space['range']
+        for i, _ in enumerate(range(log['range_0']), 1):
+            log["filters_{}".format(i)] = space['filter']
+            log["kernel_sizes_{}".format(i)] = space['kernel']
+            log["activations_{}".format(i)] = space['activation_0']
             model.add(layers.Conv2D(
-                    filters=filters,
-                    kernel_size=kernel_sizes,
-                    activation=activations
+                    filters=log["filters_{}".format(i)],
+                    kernel_size=log["kernel_sizes_{}".format(i)],
+                    activation=log["activations_{}".format(i)]
                 )
             )
 
-            conditionals_0 = space['conditional']
-            log["conditionals_0_{}".format(i)] = conditionals_0
-            if conditionals_0:
+            log["conditionals_0_{}".format(i)] = space['conditional']
+            if log["conditionals_0_{}".format(i)]:
                 model.add(layers.MaxPooling2D(pool_size=(2, 2)))
 
-            conditionals_1 = space['conditional']
-            log["conditionals_1_{}".format(i)] = conditionals_1
-            if conditionals_1:
-                dropouts = space['dropout']
-                log["dropouts_{}".format(i)] = dropouts
-                model.add(layers.Dropout(dropouts))
+            log["conditionals_1_{}".format(i)] = space['conditional']
+            if log["conditionals_1_{}".format(i)]:
+                log["dropouts_{}".format(i)] = space['dropout']
+                model.add(layers.Dropout(log["dropouts_{}".format(i)]))
 
         model.add(layers.Flatten())
 
-        conditional_2 = space['conditional']
-        log['conditional_2'] = conditional_2
-        if conditional_2:
-            filter_1 = space['filter']
-            log['filter_1'] = filter_1
-            activation_0 = space['activation_0']
-            log['activation_1'] = activation_0
-            model.add(layers.Dense(filter_1, activation=activation_0))
+        log['conditional_2'] = space['conditional']
+        if log['conditional_2']:
+            log['filter_1'] = space['filter']
+            log['activation_1'] = space['activation_0']
+            model.add(layers.Dense(log['filter_1'], activation=log['activation_1']))
 
-        dropout_1 = space['dropout']
-        log['dropout_1'] = dropout_1
-        model.add(layers.Dropout(dropout_1))
+        log['dropout_1'] = space['dropout']
+        model.add(layers.Dropout(log['dropout_1']))
 
-        activation_1 = space['activation_1']
-        log['activation_2'] = activation_1
-        model.add(layers.Dense(n_classes, activation=activation_1))
+        log['activation_2'] = space['activation_1']
+        model.add(layers.Dense(n_classes, activation=log['activation_2']))
 
-        optimizer = space['optimizer']
-        log['optimizer'] = optimizer
+        log['optimizer'] = space['optimizer']
         model.compile(
             loss='categorical_crossentropy',
             metrics=['accuracy'],
-            optimizer=optimizer
+            optimizer=log['optimizer']
         )
 
         # callbacks
@@ -231,24 +207,22 @@ def model_op(generator, X_test, Y_test, class_weights, images):
         log_dir="{}/logs/fit/{}".format(data_set, model_name)
         tensorboard = callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-        lr_reducer_factor = space['dropout']
-        log['lr_reducer_factor'] = lr_reducer_factor
+        log['lr_reducer_factor'] = space['lr_reducer_factor']
         lr_reducer = callbacks.ReduceLROnPlateau(
             monitor='val_loss',
-            factor=lr_reducer_factor,
+            factor=log['lr_reducer_factor'],
             cooldown=0,
             patience=5,
             min_lr=5e-7
         )
 
-        minibatch_size = space['minibatch']
-        log['minibatch_size'] = minibatch_size
+        log['minibatch_size'] = space['minibatch']
 
         history = model.fit_generator(
-            generator=generator(minibatch_size, images),
+            generator=generator(log['minibatch_size'], images),
             validation_data=(X_test, Y_test),
             epochs=100,
-            steps_per_epoch=int(total_train_images / minibatch_size),
+            steps_per_epoch=int(total_train_images / log['minibatch_size']),
             initial_epoch=0,
             verbose=0,
             class_weight=class_weights,
@@ -314,11 +288,17 @@ if __name__ == "__main__":
     generator, X_test, Y_test, class_weights, images = data()
     
     best_results = []
-    for i, _ in enumerate(range(max_evals)):
-        print('{} of {}'.format(i, max_evals))
-        results = model_op(generator, X_test, Y_test, class_weights, images)
-        if results['status'] == True:
-            best_results.append(results)
+
+    with trange(max_evals, postfix='best loss: ?') as pbar:
+        for _ in pbar:
+            results = model_op(generator, X_test, Y_test, class_weights, images)
+            if results['status'] == True:
+                best_results.append(results)
+                try:
+                    best_loss = min([best_result['loss'] for best_result in best_results])
+                    pbar.postfix = 'best loss: ' + str(best_loss)
+                except:
+                    pass
 
     acc_min = 0
     for model_opted in best_results:
@@ -332,3 +312,10 @@ if __name__ == "__main__":
     print(best_model.evaluate(X_test, Y_test))
     print("Best performing model chosen hyper-parameters:")
     print(best_run)
+
+    # conditional_0 = space['conditional']
+    # log['conditional_0'] = conditional_0
+    # if conditional_0:
+    #     layers.BatchNormalization()
+    # activity_regularizer=regularizers.l1(0.001)
+    # kernel_regularizer=regularizers.l2(0.001)
