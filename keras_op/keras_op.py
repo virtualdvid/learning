@@ -243,9 +243,9 @@ def model_op(gap_generator, X_test, Y_test, class_weights, images):
             initial_epoch=0,
             verbose=0,
             class_weight=class_weights,
-            max_queue_size=20,
-            workers=24,
-            use_multiprocessing=True,
+            # max_queue_size=20,
+            # workers=24,
+            # use_multiprocessing=True,
             callbacks=[
                 model_checkpoint,
                 earlystopping,
@@ -277,7 +277,7 @@ def model_op(gap_generator, X_test, Y_test, class_weights, images):
         'loss': -acc,
         'status': STATUS_OK,
         'model': model_name
-    } 
+    }
 
 
 if __name__ == "__main__":
