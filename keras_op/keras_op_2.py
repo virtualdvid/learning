@@ -119,11 +119,7 @@ class StopTraining(callbacks.Callback):
 
 def model_op(generator, X_test, Y_test, class_weights, images):
 
-    args = arg_parameters()
-    data_set = args.data
     model_name = secrets.token_hex(6)
-    total_train_images = images.count - len(X_test)
-    n_classes = len(images.classes)
     log = {'model_name': model_name}
     space = space_dict()
 
@@ -218,7 +214,7 @@ def model_op(generator, X_test, Y_test, class_weights, images):
 
         log['minibatch_size'] = space['minibatch']
 
-        history = model.fit_generator(
+        model.fit_generator(
             generator=generator(log['minibatch_size'], images),
             validation_data=(X_test, Y_test),
             epochs=100,
@@ -255,8 +251,10 @@ def model_op(generator, X_test, Y_test, class_weights, images):
         STATUS_OK = False
         print('failed', e)
 		
+    del log
     K.clear_session()
-    gc.collect()
+    for _ in range(12):
+        gc.collect()
 
     return {
         'loss': -acc,
@@ -286,6 +284,9 @@ if __name__ == "__main__":
     max_evals=args.evals
 
     generator, X_test, Y_test, class_weights, images = data()
+
+    total_train_images = images.count - len(X_test)
+    n_classes = len(images.classes)
     
     best_results = []
 
@@ -296,7 +297,7 @@ if __name__ == "__main__":
                 best_results.append(results)
                 try:
                     best_loss = min([best_result['loss'] for best_result in best_results])
-                    pbar.postfix = 'best loss: ' + str(best_loss)
+                    pbar.postfix = 'best loss: {} {}'.format(str(best_loss), log)
                 except:
                     pass
 

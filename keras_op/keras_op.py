@@ -235,7 +235,7 @@ def model_op(gap_generator, X_test, Y_test, class_weights, images):
         minibatch_size = {{choice([16, 32, 64, 128])}}
         log['minibatch_size'] = minibatch_size
 
-        history = model.fit_generator(
+        model.fit_generator(
             generator=gap_generator(minibatch_size, images),
             validation_data=(X_test, Y_test),
             epochs=100,
@@ -270,8 +270,10 @@ def model_op(gap_generator, X_test, Y_test, class_weights, images):
         model = Sequential()
         print('failed', e)
 		
+    del log
     K.clear_session()
-    gc.collect()
+    for _ in range(12):
+        gc.collect()
 
     return {
         'loss': -acc,
